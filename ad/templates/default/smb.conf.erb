@@ -1,0 +1,21 @@
+# These settings tested against:
+# Winbind 2:3.2.3-1ubuntu3.4 on Ubuntu Intrepid 8.10 
+
+[global]
+security = ads
+workgroup = <%= @ad_workgroup %>
+realm = <%= @krb5_realm %>
+server string = %h server (Samba %v)
+idmap uid = 10000-20000
+idmap gid = 10000-20000
+idmap backend = ad
+winbind enum users = Yes
+winbind enum groups = Yes
+winbind use default domain = Yes
+winbind nested groups = Yes
+winbind refresh tickets = yes
+template shell = /bin/bash
+template homedir = /home/%U
+allow trusted domains = No
+domain master = no
+

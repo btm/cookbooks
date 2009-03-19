@@ -1,0 +1,22 @@
+###
+# Managed by Chef
+# Local changes will be removed.
+###
+
+[libdefaults]
+        default_realm = <%= @krb5_realm %>
+        kdc_timesync = 1
+        ccache_type = 4
+        forwardable = true
+        proxiable = true
+
+[realms]
+<%= @krb5_realm %> = {
+<% @domain_controllers.each do |dc| -%>
+        kdc = <%= dc %>
+<% end -%>
+        admin_server = <%= @domain_controllers.first %>
+}
+[domain_realm]
+        .<%= @krb5_realm.downcase %> = <%= @krb5_realm %>
+        <%= @krb5_realm.downcase %> = <%= @krb5_realm %>
