@@ -21,6 +21,7 @@
 case node[:platform]
 when "ubuntu"
   service "apparmor" do
-    action :disable
+    action node[:apparmor][:disable] ? :disable : :enable
+    supports [ :restart, :reload, :status ]
   end
 end
