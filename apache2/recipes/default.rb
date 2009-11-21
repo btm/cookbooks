@@ -27,7 +27,7 @@ package "apache2" do
   action :install
 end
 
-service "apache2" do
+r = service "apache2" do
   case node[:platform]
   when "centos","redhat","fedora","suse"
     service_name "httpd"
@@ -49,6 +49,9 @@ service "apache2" do
   )
   action :enable
 end
+
+r.updated = true
+r.notifies(:start, r, :delayed)
 
 if platform?("centos", "redhat", "fedora", "suse")
   directory node[:apache][:log_dir] do
@@ -186,6 +189,3 @@ include_recipe "apache2::mod_log_config" if platform?("centos", "redhat", "suse"
 # uncomment to get working example site on centos/redhat/fedora
 #apache_site "default"
 
-service "apache2" do
-  action :start
-end
