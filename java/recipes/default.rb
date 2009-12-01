@@ -39,6 +39,7 @@ package java_pkg do
   response_file "java.seed"
   action :install
   notifies :run, resources(:execute => "update-java-alternatives"), :immediately
+  ignore_failure true
 end
 
 package "ant"
