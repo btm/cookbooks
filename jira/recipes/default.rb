@@ -2,7 +2,7 @@
 # Cookbook Name:: jira
 # Recipe:: default
 #
-# Copyright 2008-2011, Opscode, Inc.
+# Copyright 2008-2009, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,13 +41,11 @@ unless FileTest.exists?(node[:jira][:install_path])
   
   if node[:jira][:database] == "mysql"
     # These values don't always come from attributes.
-    mysql_root_password = node[:mysql][:server_root_password]
-    mysql_host = node[:jira][:database_host]
-    
-    # Switch to these for search based infrastructure
-    #mysql_root_password = search(:node, 'recipes:mysql\:\:server').first.mysql.server_root_password
-    #mysql_host = search(:node, 'recipes:mysql\:\:server').first.ipaddress
-    #node[:jira][:database_host] = mysql_host
+    #mysql_root_password = node[:mysql][:server_root_password]
+    #mysql_host = node[:jira][:database_host]
+    mysql_root_password = search(:node, 'recipes:mysql\:\:server').first.mysql.server_root_password
+    mysql_host = search(:node, 'recipes:mysql\:\:server').first.ipaddress
+    node[:jira][:database_host] = mysql_host
 
     # mysql should be running
     if mysql_host == "localhost"
@@ -87,7 +85,7 @@ unless FileTest.exists?(node[:jira][:install_path])
 
     remote_file "mysql-connector" do
       path "/tmp/mysql-connector.tar.gz"
-      source "http://downloads.mysql.com/archives/mysql-connector-java-5.1/mysql-connector-java-5.1.6.tar.gz"
+      source "http://downloads.mysql.com/archives/mysql-connector-java-5.1/mysql-connector-java-5.1.13.tar.gz"
     end
   
     bash "untar-mysql-connector" do
@@ -95,15 +93,19 @@ unless FileTest.exists?(node[:jira][:install_path])
     end
   
     bash "install-mysql-connector" do
-      code "cp /tmp/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar #{node[:jira][:install_path]}/common/lib"
+      code "cp /tmp/mysql-connector-java-5.1.13/mysql-connector-java-5.1.13-bin.jar #{node[:jira][:install_path]}/lib"
     end
   end
 end
 
 directory "#{node[:jira][:install_path]}" do
   recursive true
-  owner "www-data"
+  owner node[:jira][:run_user]
   notifies :run, "execute[configure file permissions]", :immediately
+end
+
+directory node[:jira][:home] do
+  owner node[:jira][:run_user]
 end
 
 execute "configure file permissions" do
@@ -112,24 +114,34 @@ execute "configure file permissions" do
 end
 
 cookbook_file "#{node[:jira][:install_path]}/bin/startup.sh" do
+  owner node[:jira][:run_user]
   source "startup.sh"
   mode 0755
 end
   
 cookbook_file "#{node[:jira][:install_path]}/bin/catalina.sh" do
+  owner node[:jira][:run_user]
   source "catalina.sh"
   mode 0755
 end
 
 template "#{node[:jira][:install_path]}/conf/server.xml" do
+  owner node[:jira][:run_user]
   source "server.xml.erb"
-  mode 0755
+  mode 0644
 end
   
 template "#{node[:jira][:install_path]}/atlassian-jira/WEB-INF/classes/entityengine.xml" do
+  owner node[:jira][:run_user]
   source "entityengine.xml.erb"
-  mode 0755
+  mode 0644
 end
+
+template "#{node[:jira][:install_path]}/atlassian-jira/WEB-INF/classes/jira-application.properties" do
+  owner node[:jira][:run_user]
+  source "jira-application.properties.erb"
+  mode 0644
+end 
 
 runit_service "jira"
 

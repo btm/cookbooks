@@ -2,7 +2,7 @@
 # Cookbook Name:: jira
 # Attributes:: jira
 #
-# Copyright 2008-2011, Opscode, Inc.
+# Copyright 2008-2009, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@
 default[:jira][:virtual_host_name]  = "jira.#{domain}"
 default[:jira][:virtual_host_alias] = "jira.#{domain}"
 # type-version-standalone
-default[:jira][:version]           = "enterprise-3.13.1"
+default[:jira][:version]           = "enterprise-4.2.4-b591"
 default[:jira][:install_path]      = "/srv/jira"
+default[:jira][:home]              = "/srv/jira/home"
 default[:jira][:run_user]          = "www-data"
 default[:jira][:database]          = "mysql"
 # The mysql cookbook binds to ipaddress by default. Add this to the role.
